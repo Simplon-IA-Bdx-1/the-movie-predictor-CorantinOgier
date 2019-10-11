@@ -1,4 +1,8 @@
 #https://docs.python.org/3/library/argparse.html documentation
+"""
+Corantin Ogier
+themoviepredictor script
+"""
 
 import mysql.connector 
 import sys
@@ -72,7 +76,7 @@ if args.context == "people":
     if args.action == "list": 
         result = find("people", 0, 'list')
         if args.export: #si l'args.export existe sinon on peut écrire 'if args.export != None'
-            print('exportation')
+            print('exportation réalisée')
             
             # Autre façon d'ouvrir le csvfile qui permet de ne pas utiliser le csvfile.close()
             
@@ -100,7 +104,7 @@ if args.context == "movies":
     if args.action == "list": 
         result = find("movies", 0, 'list')
         if args.export:
-            print('exportation')
+            print('exportation réalisée')
             csvfile = open(args.export, 'w', encoding='UTF-8' , newline='\n')
             writer = csv.writer(csvfile)
             writer.writerow(result[0].keys())
