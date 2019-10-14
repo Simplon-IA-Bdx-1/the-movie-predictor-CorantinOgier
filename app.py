@@ -37,11 +37,36 @@ def find(table, id, search):
 def findQueryAll(table):
     return("SELECT * FROM {}".format(table))
 
+def insertMovieQuery(table, title, duration, original_title, release_date, rating):
+    return("INSERT INTO {} (title, duration, original_title, release_date, rating) VALUES ('{}', '{}', '{}', '{}', '{}')".format(table, title, duration, original_title, release_date, rating))
+
+def insertPeopleQuery(table, firstname, lastname):
+    return("INSERT INTO {} (firstname, lastname) VALUES ('{}', '{}')".format(table, firstname, lastname))
+
 def createCursor(cnx):
     return cnx.cursor(dictionary=True)
 
 def closeCursor(cursor):
     cursor.close()
+
+def insertPeople(table, firstname, lastname):
+    cnx = connectToDatabase()
+    cursor = createCursor(cnx)
+    result = cursor.execute(insertPeopleQuery(table, firstname, lastname))
+    cnx.commit()
+    closeCursor(cursor)
+    disconnectDatabase(cnx)
+    return result
+
+def insertMovie(table, title, duration, original_title, release_date, rating):
+    cnx = connectToDatabase()
+    cursor = createCursor(cnx)
+    result = cursor.execute(insertMovieQuery(table, title, duration, original_title, release_date, rating))
+    cnx.commit()
+    closeCursor(cursor)
+    disconnectDatabase(cnx)
+    return result
+    
 
 # ArgumentParser.add_argument(name or flags...[, action][, nargs]
 # [, const][, default][, type][, choices][, required][, help][, metavar][, dest])
@@ -63,6 +88,15 @@ parser_list = subparsers.add_parser('list')
 parser_find = subparsers.add_parser('find')
 parser_find.add_argument('id', metavar='id', type=int)
 parser.add_argument('--export', metavar='file.csv')
+
+parser_insert = subparsers.add_parser('insert')
+parser_insert.add_argument('--firstname', metavar='firstname', help='Insérer le prénom')
+parser_insert.add_argument('--lastname', metavar='lastname', help='Insérer le nom')
+parser_insert.add_argument('--title', metavar='title', help='Titre')
+parser_insert.add_argument('--duration', metavar='duration', help='Duree du film')
+parser_insert.add_argument('--original-title', metavar='original-title', help='Titre d\'origine du film')
+parser_insert.add_argument('--rating', metavar='rating', help='Age recommandé pour voir le film')
+parser_insert.add_argument('--release-date', metavar='release-date', help='Date de sortie du film')
 
 args = parser.parse_args() #une fois les add choisis, il analyse nos arguments et les stocks dans args
 
@@ -119,6 +153,13 @@ if args.context == "movies":
         for movie in result:
             print("#{}: {} released on {}".format(movie['id'], movie['title'], movie['release_date']))
 
+if args.context == "people":
+    if args.action == "insert":
+        insertPeople('people', args.firstname, args.lastname)
+
+if args.context == "movies":
+    if args.action == "insert":
+        insertMovie('movies', args.title, args.duration, args.original_title, args.release_date, args.rating)
 
 
 
