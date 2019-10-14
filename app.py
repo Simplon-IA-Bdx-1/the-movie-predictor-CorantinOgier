@@ -52,20 +52,19 @@ def closeCursor(cursor):
 def insertPeople(table, firstname, lastname):
     cnx = connectToDatabase()
     cursor = createCursor(cnx)
-    result = cursor.execute(insertPeopleQuery(table, firstname, lastname))
+    cursor.execute(insertPeopleQuery(table, firstname, lastname))
     cnx.commit()
     closeCursor(cursor)
     disconnectDatabase(cnx)
-    return result
 
 def insertMovie(table, title, duration, original_title, release_date, rating):
     cnx = connectToDatabase()
     cursor = createCursor(cnx)
-    result = cursor.execute(insertMovieQuery(table, title, duration, original_title, release_date, rating))
+    cursor.execute(insertMovieQuery(table, title, duration, original_title, release_date, rating))
     cnx.commit()
     closeCursor(cursor)
     disconnectDatabase(cnx)
-    return result
+
     
 
 # ArgumentParser.add_argument(name or flags...[, action][, nargs]
@@ -88,6 +87,12 @@ parser_list = subparsers.add_parser('list')
 parser_find = subparsers.add_parser('find')
 parser_find.add_argument('id', metavar='id', type=int)
 parser.add_argument('--export', metavar='file.csv')
+
+"""parser_import = subparsers.add_argument('import', metavar='file.csv', help='Importer un fichier csv')
+parser_import.add_argument('--file' , help='file.csv')"""
+
+parser_find = subparsers.add_parser('import', help='importer un fichier csv dans la DB')
+parser_find.add_argument('--file' , help='file.csv')
 
 parser_insert = subparsers.add_parser('insert')
 parser_insert.add_argument('--firstname', metavar='firstname', help='Insérer le prénom')
@@ -160,6 +165,13 @@ if args.context == "people":
 if args.context == "movies":
     if args.action == "insert":
         insertMovie('movies', args.title, args.duration, args.original_title, args.release_date, args.rating)
+    if args.action == "import":
+        if args.file:
+            with open(args.file) as csv_file:
+                reader = csv.DictReader(csv_file, delimiter=',')
+                for row in reader:
+                    insertMovie("movies", row['title'], row['original_title'], int(row['duration']), row['release_date'], row['rating'])
+
 
 
 
