@@ -38,11 +38,11 @@ def findQueryAll(table):
     return("SELECT * FROM {}".format(table))
 
 def insertMovieQuery(table, title, duration, original_title, release_date, rating):
-    return("INSERT INTO `{}` (title, duration, original_title, release_date, rating) VALUES ('{}', {}, '{}', '{}', '{}')".format(table, title, duration, original_title, release_date, rating))
-# On enlève les guillemets sur les acolades correspondantes à duration
+    return("INSERT INTO `{}` (title, duration, original_title, release_date, rating) VALUES ('{}', {}, '{}', '{}', '{}');".format(table, title, duration, original_title, release_date, rating))
+# On enlève les guillemets sur les accolades correspondantes à duration
 
 def insertPeopleQuery(table, firstname, lastname):
-    return("INSERT INTO `{}` (firstname, lastname) VALUES ('{}', '{}')".format(table, firstname, lastname))
+    return("INSERT INTO `{}` (firstname, lastname) VALUES ('{}', '{}');".format(table, firstname, lastname))
 
 def createCursor(cnx):
     return cnx.cursor(dictionary=True)
@@ -168,12 +168,14 @@ if args.context == "movies":
         insertMovie('movies', args.title, args.duration, args.original_title, args.release_date, args.rating)
     if args.action == "import":
         if args.file:
-            with open(args.file) as csv_file:
-                reader = csv.DictReader(csv_file, delimiter=',')
+            with open(args.file, 'r', encoding='utf-8', newline='\n') as csvfile:
+                reader = csv.DictReader(csvfile)
                 for row in reader:
-                    insertMovie("movies", row['title'], row['original_title'], row['duration'], row['release_date'], row['rating'])
-
-
-
-
-
+                    insertMovie("movies",
+                        title=row['title'],
+                        original_title=row['original_title'],
+                        duration=row['duration'],
+                        rating=row['rating'],
+                        release_date=row['release_date']
+                    )
+                    print(f"Nouveau film inséré")
