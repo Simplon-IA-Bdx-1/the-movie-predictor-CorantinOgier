@@ -168,7 +168,10 @@ if args.context == "people":
     if args.action == "find":
         peopleId = args.id
         person = find("people", peopleId)
-        printPerson(person)
+        if (person == None):
+            print(f"Aucune personne avec l'id {peopleId} n'a été trouvé ! Try Again!")
+        else:
+            printPerson(person)
     if args.action == "insert":
         print(f"Insertion d'une nouvelle personne: {args.firstname} {args.lastname}")
         person = Person(
