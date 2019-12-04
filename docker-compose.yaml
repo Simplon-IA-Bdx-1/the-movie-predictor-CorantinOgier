@@ -1,22 +1,31 @@
 version: "3.7"
 
 services: 
+  app:
+    container_name: tmp_app
+    build: .
+    env_file: 
+      - auth.env
+    volumes:
+      - .:/usr/src/themoviepredictor
+    networks:
+      - database_net  
+    command: tail -f /dev/null
+    depends_on:
+      - database
   database:
+    container_name: tmp_database
     image: mysql:latest
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=yes
-      - MYSQL_USER=predictor
-      - MYSQL_PASSWORD=predictor
-      - MYSQL_DATABASE=predictor
+    env_file:
+      - auth.env
     networks:
       - database_net
-    ports:
-      - 3306:3306
     volumes: 
       - database_data:/var/lib/mysql
     command: --default_authentication_plugin=mysql_native_password
   
   adminer:
+    container_name: tmp_adminer
     image: dehy/adminer
     ports: 
       - 8080:80
@@ -25,7 +34,9 @@ services:
 
 networks:
   database_net:
-     driver: bridge
+    name: tmp_network
+    driver: bridge
 
 volumes:
   database_data:
+    name: tmp_volume
